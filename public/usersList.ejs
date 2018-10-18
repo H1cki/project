@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{name}}</title>
+    <meta charset="utf-8" />
+</head>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="../javascripts/jquery.ba-throttle-debounce.min.js"></script>
+
+<style>
+    img{
+        cursor: pointer;
+    }
+</style>
+
+<body>
+
+    <h2>Список пользователей</h2>
+    <input type="hidden" name="id" value="0" />
+    <div class="form-group">
+        <label for="age"> Search</label>
+        <input class="form-control" type="text" />
+        <button id="searchButton">Search</button>
+    </div>
+
+
+
+    <table class="table table-condensed table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>First name <img class="SearchColumnHead" id="firstName" value="nosort" src="../images/arrow.png"
+                        alt="" width="15px" height="15px"></th>
+                <th>Last name <img class="SearchColumnHead" id="lastName" value="nosort" src="../images/arrow.png" alt=""
+                        width="15px" height="15px"></th>
+                <th>Email <img class="SearchColumnHead" id="login" value="nosort" src="../images/arrow.png" alt=""
+                        width="15px" height="15px"></th>
+                <th>Age <img class="SearchColumnHead" id="Age" value="nosort" src="../images/arrow.png" alt="" width="15px"
+                        height="15px"></th>
+                <th>Role <img class="SearchColumnHead" id="Role" value="nosort" src="../images/arrow.png" alt="" width="15px"
+                        height="15px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for(var i=0; i<users.length; i++) { %>
+            <tr>
+                <td>
+                    <%= users[i].firstName %>
+                </td>
+                <td>
+                    <%= users[i].lastName %>
+                </td>
+                <td>
+                    <%= users[i].login %>
+                </td>
+                <td>
+                    <%= users[i].Age %>
+                </td>
+                <td>
+                    <%= users[i].Role %>
+                </td>
+            </tr>
+            <% } %>
+            <% if (pages > 0) { %>
+            <tr class="pagination text-center">
+                <% if (current == 1) { %>
+                <!-- <td class="disabled"><button>First</button></td> -->
+                <% } else { %>
+                <!-- <td><button>First</button></td> -->
+                <% } %>
+                <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+                <% if (i !== 1) { %>
+                <td class="disabled"><button>...</button></td>
+                <% } %>
+                <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
+                <% if (i == current) { %>
+                <td class="active"><button class="page" id="<%= i %>">
+                        <%= i %></button></td>
+                <% } else { %>
+                <td><button class="page" id="<%= i %>">
+                        <%= i %></button></td>
+                <% } %>
+                <% if (i == Number(current) + 4 && i < pages) { %>
+                <td class="disabled"><button>...</button></td>
+                <% } %>
+                <% } %>
+                <% if (current == pages) { %>
+                <!-- <td class="disabled"><button>Last</button></td> -->
+                <% } else { %>
+                <!-- <td><button>Last</button></td> -->
+                <% } %>
+                <% } else { %>
+                <p>here<</p> <% } %>
+
+
+        </tbody>
+    </table>
+    <script>
+        function debounce(fn, interval) {
+            let timer;
+            return function debounced() {
+                clearTimeout(timer);
+                let args = arguments;
+                timer = setTimeout(() => {
+                    fn.apply(this, args);
+                }, interval);
+            };
+        }
+        localStorage.clear();
+        let Search = 0;
+        $("table").css({ "border-bottom": "none" })
+        $(document).on('click', '.page', function (e) {
+            let searchField = $(".form-control").val()
+            let page = $(this).attr("id");
+            $(".Search").attr("activPage", page);
+            $(this).attr("activPage", page)
+            let activPage = $(this).attr("id");
+            let val = $(this).attr("value");
+            let nameId = $(this).attr("nameId")
+            localStorage.setItem("activePage", activPage)
+            let direction = localStorage.getItem("direction");
+            let nameDirection = localStorage.getItem("nameDirection");
+            let activePage = localStorage.getItem("activePage");
+            console.log(localStorage.getItem("activePage"))
+            $.get('/sort/1', {
+                searchField,
+                direction,
+                field_name: nameDirection,
+                current_page: activePage
+            }).done(function (data) {
+                console.log(data)
+                $("tbody").html(data);
+
+            });
+        });
+
+        function search() {
+            let searchField = $(".form-control").val()
+            let direction = localStorage.getItem("direction");
+            let nameDirection = localStorage.getItem("nameDirection");
+            let activePage = localStorage.getItem("activePage");
+            console.log(Search)
+
+            $.get('/sort/1', {
+                searchField,
+                direction,
+                field_name: nameDirection,
+                current_page: 1
+            }).done(function (data) {
+                $("tbody").html(data);
+
+            });
+        }
+
+        $('.form-control').keyup(debounce(search,500));
+
+
+        $(".SearchColumnHead").click(function (e) {
+            let searchField = $(".form-control").val()
+            let clickedId = $(this).attr("id");
+            let val = $("#" + clickedId).attr("value");
+            localStorage.setItem("direction", val)
+            localStorage.setItem("nameDirection", clickedId)
+            let direction = localStorage.getItem("direction");
+            let nameDirection = localStorage.getItem("nameDirection");
+            let activePage = localStorage.getItem("activePage");
+
+            $.get('/sort/1', {
+                searchField,
+                direction,
+                field_name: nameDirection,
+                current_page: activePage
+                // 'localStorage[]': [direction, nameDirection, activePage]
+            }).done(function (data) {
+
+
+                $("tbody").html(data);
+
+                $(".Search").attr("value", "nosort")
+                $(".Search").attr("src", "../images/arrow.png")
+                $('.page').attr("nameId", clickedId)
+
+                if (val == "beginsort") {
+                    $('.page').attr("value", "beginsort")
+                    $("#" + clickedId).attr("value", "endsort")
+                    $("#" + clickedId).attr("src", "../images/arrow.png");
+
+                } else if ((val == "endsort") || (val == "nosort")) {
+                    $('.page').attr("value", "endsort")
+                    $("#" + clickedId).attr("value", "beginsort");
+                    $("#" + clickedId).attr("src", "../images/menu.png");
+
+                } else
+                    console.log("err");
+            });
+
+        });
+
+
+
+
+        /* $('#Age').on('click', function () {
+             let val = ($("#Age").attr("value"));
+             let id = $("#Age").attr("id");
+             $.get('/sort', { Value: val, Id: id }).done(function (data) {
+                 $("tbody").html(data);
+                 if (val == "beginsort") {
+                     $("#Age").attr("src", "images/arrow.png");
+                     $("#Age").attr("value", "endsort")
+ 
+                 } else if ((val == "endsort") || (val == "nosort")) {
+                     $("#Age").attr("value", "beginsort");
+                     $("#Age").attr("src", "images/menu.png");
+                 } else
+                     console.log("err");
+             });*/
+
+
+    </script>
+</body>
+<html>

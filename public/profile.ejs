@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" href="images/favicon.ico">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script type="text/javascript" src="http://lab.alexcican.com/set_cookies/cookie.js"></script>
+
+
+  <title>Signin Template for Bootstrap</title>
+  <link href="stylesheets/bootstrap.min.css" rel="stylesheet">
+  <link href="stylesheets/signin.css" rel="stylesheet">
+  <link href="stylesheets/proFile.css" rel="stylesheet">
+</head>
+
+<body class="text-center">
+  <form class="form-signin" enctype="form-data" action="/profile" id=loginForm method="post" name="userForm">
+    <div class="proFile">
+      <div class="avatar">
+        <div class="photo"><img id="img" src="<%=user.Avatar %>" alt="asd" width="250" height="250"></div>
+        <form action="/profile" method="post" enctype="multipart/form-data">
+          <input type="file" name="avatar" />
+        </form>
+      </div>
+      <div class="information_field">
+        <div class="pedit_row">
+          <div class="pedit_label">First Name</div>
+          <div class="pedit_labeled"><input disabled="disabled" id=firstName type="text" value="<%=user.firstName %>"
+              autocomplete="off" name="firstName"></div>
+        </div>
+        <div class="pedit_row">
+          <div class="pedit_label">Last Name</div>
+          <div class="pedit_labeled"><input disabled="disabled" id=lastName type="text" value="<%=user.lastName %>"
+              autocomplete="off" name="lastName"></div>
+        </div>
+        <div class="pedit_row">
+          <div class="pedit_label">Age</div>
+          <div class="pedit_labeled"><input disabled="disabled" id="userAge" type="number" value="<%=user.Age %>"
+              autocomplete="off" name="userAge"></div>
+        </div>
+        <div class="pedit_row">
+          <div class="pedit_label">Role</div>
+          <div class="pedit_labeled"><input disabled="disabled" id="userRole" type="text" value="<%=user.Role %>"
+              autocomplete="off" name="userRole"></div>
+        </div>
+        <div class="pedit_row"> <button type="button" id=change>Change</button> <button type="submit">Save</button></div>
+      </div>
+
+    </div>
+  </form>
+  <script>
+
+    $("#change").click(function () {
+      $("#userAge").prop('disabled', false)
+      $("#firstName").prop('disabled', false)
+      $("#lastName").prop('disabled', false)
+      $("#userRole").prop('disabled', false)
+    });
+
+    $("form").submit(function (e) {
+
+      e.preventDefault();
+  
+      let oldForm = document.forms.userForm
+      let formData = new FormData();
+      formData.append('firstName', document.querySelector('input[name="firstName"]').value);
+      formData.append('lastName', document.querySelector('input[name="lastName"]').value);
+      formData.append('userAge', document.querySelector('input[name="userAge"]').value);
+      formData.append('userRole', document.querySelector('input[name="userRole"]').value);
+      formData.append('avatar', document.querySelector('input[name="avatar"]').files[0]);
+      $("#userAge").prop('disabled', true)
+      $("#firstName").prop('disabled', true)
+      $("#lastName").prop('disabled', true)
+      $("#userRole").prop('disabled', true)
+      $.ajax({
+        type: "POST",
+        url: '/profile',
+        data: formData,
+        success: function (data) {
+          console.log("second success", data);
+          $("#img").attr("src", data.user.Avatar)
+          console.log((data.user.Avatar) + '.' + 'png');
+
+        },
+        error: function (err) {
+          console.log("error", err);
+        },
+        contentType: false,
+        processData: false,
+      });
+    });
+  </script>
+</body>
+
+</html>

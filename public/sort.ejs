@@ -1,0 +1,51 @@
+<% for(var i=0; i<users.length; i++) { %>
+        <tr>
+            <td>
+                <%= users[i].firstName %>
+            </td>
+            <td>
+                <%= users[i].lastName %>
+            </td>
+            <td>
+                <%= users[i].login %>
+            </td>
+            <td>
+                <%= users[i].Age %>
+            </td>
+            <td>
+                <%= users[i].Role %>
+            </td>
+        </tr>
+        <% } %>
+        <% if (pages > 0) { %>
+            <tr class="pagination text-center">
+                <% if (current == 1) { %>
+                <!-- <td class="disabled"><button>First</button></td> -->
+                <% } else { %>
+                <!-- <td><button>First</button></td> -->
+                <% } %>
+                <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+                <% if (i !== 1) { %>
+                <td class="disabled"><button>...</button></td>
+                <% } %>
+                <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
+                <% if (i == current) { %>
+                <td class="active"><button class="page" id="<%= i %>" >
+                        <%= i %></button></td>
+                <% } else { %>
+                <td ><button class="page" id="<%= i %>">
+                        <%= i %></button></td>
+                <% } %>
+                <% if (i == Number(current) + 4 && i < pages) { %>
+                <td class="disabled"><button>...</button></td>
+                <% } %>
+                <% } %>
+                <% if (current == pages) { %>
+                <!-- <td class="disabled"><button>Last</button></td> -->
+                <% } else { %>
+                <!-- <td><button>Last</button></td> -->
+                <% } %>
+            
+            <% } else { %>
+                <p>No users</p>
+            <% } %>
